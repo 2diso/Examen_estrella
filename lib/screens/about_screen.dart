@@ -154,10 +154,9 @@ class AboutScreen extends StatelessWidget {
 
                       final nombre = data?['nombre']?.toString();
                       final genero = data?['genero']?.toString();
-
-                      // Validar campos esenciales
+                      
                       if (nombre == null || genero == null) {
-                        return const SizedBox(); // No renderizar tarjetas inválidas
+                        return const SizedBox(); 
                       }
 
                       final personaje = Personaje(
