@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/personaje_model.dart';
 import '../services/swapi_service.dart';
 import 'personaje_detail_screen.dart';
+import '../widgets/custom_drawer.dart'; // ✅ Importado para la navbar
 
 class PersonajeListScreen extends StatefulWidget {
   const PersonajeListScreen({super.key});
@@ -52,7 +53,9 @@ class _PersonajeListScreenState extends State<PersonajeListScreen> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.yellow,
         title: const Text('Personajes de Star Wars'),
+        centerTitle: true,
       ),
+      drawer: const CustomDrawer(), // ✅ Drawer agregado para navbar
       body: Column(
         children: [
           Padding(

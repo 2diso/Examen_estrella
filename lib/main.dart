@@ -70,7 +70,7 @@ class _HomeState extends State<Home> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                "Explora el universo de Star Wars ⭐️. Conoce a los personajes más emblemáticos de la saga y guarda tus favoritos.",
+                "Explora el universo de Star Wars. Conoce a los personajes más emblemáticos de la saga y guarda tus favoritos.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
