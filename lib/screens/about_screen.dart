@@ -13,8 +13,16 @@ class AboutScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final userId = user?.uid ?? '';
 
-    final hasPhoto = user?.photoURL != null &&
-        user!.photoURL!.isNotEmpty &&
+    if (user == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text('Debes iniciar sesión para ver esta pantalla'),
+        ),
+      );
+    }
+
+    final hasPhoto = user.photoURL != null &&
+        user.photoURL!.isNotEmpty &&
         Uri.tryParse(user.photoURL!)?.hasAbsolutePath == true;
 
     return Scaffold(
@@ -41,24 +49,20 @@ class AboutScreen extends StatelessWidget {
                   ),
                   color: Colors.white,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 24, horizontal: 28),
+                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         hasPhoto
                             ? CircleAvatar(
                                 radius: 60,
-                                backgroundImage: NetworkImage(user!.photoURL!),
+                                backgroundImage: NetworkImage(user.photoURL!),
                               )
                             : CircleAvatar(
                                 radius: 60,
                                 backgroundColor: Colors.grey.shade300,
                                 child: Text(
-                                  (user?.email != null &&
-                                          user!.email!.isNotEmpty)
-                                      ? user.email![0].toUpperCase()
-                                      : '?',
+                                  user.email?.substring(0, 1).toUpperCase() ?? '?',
                                   style: const TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
@@ -68,7 +72,7 @@ class AboutScreen extends StatelessWidget {
                               ),
                         const SizedBox(height: 16),
                         Text(
-                          user?.displayName ?? 'Usuario sin nombre',
+                          user.displayName ?? 'Usuario sin nombre',
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -77,7 +81,7 @@ class AboutScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          user?.email ?? 'Sin correo',
+                          user.email ?? 'Sin correo',
                           style: const TextStyle(color: Colors.black87),
                         ),
                         const SizedBox(height: 16),
@@ -88,7 +92,7 @@ class AboutScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '¡Gracias ${user?.displayName ?? 'usuario'} por explorar el universo Star Wars!',
+                          '¡Gracias ${user.displayName ?? 'usuario'} por explorar el universo Star Wars!',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
@@ -119,10 +123,17 @@ class AboutScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    );
                   }
+
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Text("Aún no has agregado favoritos.");
+                    return const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text("Aún no has agregado favoritos."),
+                    );
                   }
 
                   final docs = snapshot.data!.docs;
@@ -139,10 +150,19 @@ class AboutScreen extends StatelessWidget {
                     ),
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
+                      final data = docs[index].data() as Map<String, dynamic>?;
+
+                      final nombre = data?['nombre']?.toString();
+                      final genero = data?['genero']?.toString();
+
+                      // Validar campos esenciales
+                      if (nombre == null || genero == null) {
+                        return const SizedBox(); // No renderizar tarjetas inválidas
+                      }
+
                       final personaje = Personaje(
-                        nombre: data['nombre'],
-                        genero: data['genero'],
+                        nombre: nombre,
+                        genero: genero,
                       );
 
                       return InkWell(
@@ -150,8 +170,7 @@ class AboutScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  PersonajeDetailScreen(personaje: personaje),
+                              builder: (_) => PersonajeDetailScreen(personaje: personaje),
                             ),
                           );
                         },
@@ -164,8 +183,7 @@ class AboutScreen extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.person,
-                                    size: 60, color: Colors.grey),
+                                const Icon(Icons.person, size: 60, color: Colors.grey),
                                 const SizedBox(height: 8),
                                 Text(
                                   personaje.nombre.toUpperCase(),
